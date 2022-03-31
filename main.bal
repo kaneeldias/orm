@@ -15,7 +15,6 @@ type Table record {|
 
     // This is used for soft delete functionality. To preserve data in order to recover if needed
     // time:Utc? deleted_at;
-    
 |};
 
 

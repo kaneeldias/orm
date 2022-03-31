@@ -1,68 +1,115 @@
-import ballerina/sql;
 import ballerina/jballerina.java;
-
+# Represents a database client connection.
 public client class Client {
+ 
+   # Initializes the DB Client. DB connection configs are fetched from the `Config.toml`
+   # + return - An `Error` if the client creation fails
+   public isolated function init() returns Error? {}
+ 
+ 
+ 
+   # Insert the record entity value into the DB table. Table details are fetched from the 
+   # annotations
+   #
+   # + value - Entity value need to add to the DB
+   # + return - Metadata of the execution as an `ExecutionResult` or an `Error`
+   remote isolated function insert(record {} value) returns ExecutionResult|Error {
+       return {
+           affectedRowCount: 1,
+           lastInsertId: 2
+       };
+   }
+ 
+ 
+   # Delete the record from the DB table, for the given condition. If the condition is not 
+   # provided, all the records in the table will be deleted.
+   #
+   # + 'table - Ballerina record descriptor which mapped to the table.
+   # + condition - Condition
+   # + return - Metadata of the execution as an `ExecutionResult` or an `Error`
+   remote isolated function delete(typedesc<record {}> 'table, *Condition condition) returns ExecutionResult|Error? {
+        return {
+            affectedRowCount: 1,
+            lastInsertId: 2
+        };
+   }
+ //  delete(User, name="Alice", age=30)
+ 
+   # Update the record entity value to the DB table. Table details are fetched from the 
+   # annotations
+   #
+   # + updateValues - Entity value need to update the DB
+   # + return - Metadata of the execution as an `ExecutionResult` or an `Error`
+   remote isolated function update(record {} updateValues) returns ExecutionResult|Error {
+       return {
+           lastInsertId: 1,
+           affectedRowCount: 2
+       };
+   }
+	// User user = {id =1, name="Alice1"} 
+	//  update(user, name="Alice")
+	// update({name="Alice1"}, name="Alice")	
+ 
+   # query the table mapped to the Ballerina record and return. If no condition is provided, 
+   # all rows are fetched.
+   #
+   # + rowType - The `typedesc` of the record to which the result needs to be returned.
+   # + condition - Condition
+   # + return - Stream of records in the `rowType` type
+   remote isolated function get(typedesc<record {}> rowType = <>, *Condition condition) returns stream <rowType, Error?> = @java:Method {
+           'class: "io.ballerina.stdlib.sql.utils.RecordIteratorUtils"
+   } external;
+ 
+   # query the table mapped to the Ballerina record and return with associations. If no 
+   # condition is provided, all rows are fetched.
+   #
+   # + rowType - The `typedesc` of the record to which the result needs to be returned.
+   # + condition - Condition
+   # + return - Stream of records in the `rowType` type
+   remote isolated function getWithAssociations(typedesc<record {}> rowType = <>, *Condition  condition) returns stream <rowType, Error?> = @java:Method {
+           'class: "io.ballerina.stdlib.sql.utils.RecordIteratorUtils"
+   } external;
+ 
+   # query the table mapped to the Ballerina record and return one record.
+   #
+   # + rowType - The `typedesc` of the record to which the result needs to be returned.
+   # + condition - Condition
+   # + return - Result in the `returnType` type or an `sql:Error`
+   remote isolated function getRecord(typedesc<record {}> rowType = <>, *Condition condition) returns rowType|Error = @java:Method {
+           'class: "io.ballerina.stdlib.sql.utils.RecordIteratorUtils"
+   } external;
 
-        // intit -> Connection details, batch size
-
-        remote isolated function insert(record {} insertRecord) returns sql:ExecutionResult|error? {
-            // Should the records be updated for auto incremnt coloumns?
-
-            //todo: Check performance of insert only specific coloumns and whether to support it if needed
-            return;
-        }
-
-         remote isolated function batchInsert(record {}[] records) returns sql:ExecutionResult|error? {
-            // Should the records be updated for auto incremnt coloumns?
-        }
-        // todo: Support upsert?
-
-        
-        remote isolated function delete(typedesc<record {}> deleteTable, record {}? condition = ()) returns sql:ExecutionResult|error? {
-            // Condition record will add where clause with and conditions
-        }
-
-        remote isolated function deleteWithCondition(typedesc<record {}> deleteTable, sql:ParameterizedQuery query) returns sql:ExecutionResult|error? {
-            // Since it is only where clause do we need to support QueryBuilder in delete function for completeion sake?
-        }
-
-        remote isolated function update(record {} updateValues, record {}? condition = ()) returns sql:ExecutionResult|error? {
-            
-        }
-
-        remote isolated function updatesWithCondition(record {} updateValues, sql:ParameterizedQuery query) returns sql:ExecutionResult|error? {
-            // Should update only one column with a condition be allowed here.?
-
-        }
-
-        remote isolated function query(typedesc<record {}> tableType = <>, record {}? condition = ()) returns stream<tableType, error?> = @java:Method {
-                'class: "",
-                name: ""
-            } external;
-
-        remote isolated function queryWithcondition( sql:ParameterizedQuery query, typedesc<record {}> tableType = <>) returns stream<tableType, error?> = @java:Method {
-                'class: "",
-                name: ""
-            } external;
-
-        remote isolated function queryWithBuilder(QueryBuilder query, typedesc<record {}> tableType = <>) returns stream<tableType, error?> = @java:Method {
-                'class: "",
-                name: ""
-            } external;
-
-
-
-
-
-        remote isolated function count(typedesc<record {}> countTable) returns int|error? {
-        }
-
-        remote isolated function countWithQueryBuilder(typedesc<record {}> countTable, QueryBuilder queryBuilder) returns int|error? {
-            // Select any other coloumns,
-            // Count is of distinct
-            // Order by
-            // group by
-            // where
-        }
-
+    # query the table mapped to the Ballerina record and return one record.
+   #
+   # + rowType - The `typedesc` of the record to which the result needs to be returned.
+   # + condition - Condition
+   # + return - Result in the `returnType` type or an `sql:Error`
+   remote isolated function getRecordWithAssociation(typedesc<record {}> rowType = <>, *Condition condition) returns rowType|Error = @java:Method {
+           'class: "io.ballerina.stdlib.sql.utils.RecordIteratorUtils"
+   } external;
+ 
+   // Closes the connection and shuts down the connection pool.
+   public isolated function close() returns Error? {}
 }
+ 
+# Condition that needs to be applied for the operation.
+#
+# + 'table - table which cannot be a key
+# + rowType - rowType
+public type Condition record {|
+   never 'table?;
+   never rowType?;
+   anydata...;
+|};
+ 
+# Metadata of the query execution.
+#
+# + affectedRowCount - Number of rows affected by the execution of the query. It may be one of the following, 
+# + lastInsertId - The ID generated by the database in response to query execution. This can be `()` in case the database does not support this feature
+public type ExecutionResult record {
+   int? affectedRowCount;
+   string|int? lastInsertId;
+};
+ 
+# Defines the generic error type for the `sql` module.
+public type Error distinct error;
