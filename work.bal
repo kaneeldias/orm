@@ -27,7 +27,7 @@ type Worker record {|
     Workplace workplace?;
 
     @ForeignKey {
-        'key: "worker_id",
+        key: "worker_id",
         reference: "recipe_id",
         many2many: "worker_recipe"
     }
@@ -77,11 +77,21 @@ function insertWorkplace() returns error? {
         workers: [tom]
     };
 
+    Workplace wso3 = {
+        name: "WSO2",
+        address: "Colombo",
+        phone: "011-273-2222",
+        workers: [tom]
+    };
+
     // Note: the worker record needs to be persisted as well (nested)
     // Issues: how do we determine whether tom is already in the database or not? From the id/primary key field?
     _ = check db->insert(wso2);
+    _ = check db->insert(wso3);
 
     // Issues: it is possible to create a workplace without any workers. Shouldn't this be blocked?
+
+    // Note: Have insert as two APIs (with and without associations) 
 }
 function getAll() returns error? {
     Client db = check new();
@@ -100,10 +110,8 @@ function getWorker() returns Worker|error {
     Client db = check new();
 
     // Note: this would not fetch the workplace details
-    // Issues: it should be possible to do `Worker john = check db->getRecord({"name": "john"})`
     // Issues: can we check whether the `worker` record contains the fields mentioned in the filter at compile time?
-    // Issues: if it is required to fetch by ID, how would the user know that the `id` field exists? If so, do we need to update the record's `id` field on insertion?
-    Worker john = check db->getRecord(Worker, {"name": "john"});
+    Worker john = check db->getRecord(name = "john", age = 324);
     return john;
 }
 
@@ -111,7 +119,7 @@ function getWorkerWithAssociation() returns Worker|error {
     Client db = check new();
 
     // New: API to fetch a single record with association
-    // Issues: how should we handle chaining and cycles?
+    // Issues: how should we handle chaining and cycles? - only one level down
     // Issues: should be able to specify which fields to eagerly load?
     // Suggestion:
     //      john.workplace = check db->getRecord(Workplace, {"id", "workplace_id"});
@@ -124,7 +132,8 @@ function deleteWorker() returns error? {
     Worker john = check getWorker();
 
     // Issue: it should be possible to do `db->delete(john)`
-    _ = check db->delete(Worker, john);
+    _ = check db->delete(Worker, name = "john", age = 34);
+    _ = check db->delete(Worker, john); // Must be a typed record
 
     // Note: in this case, we should not delete the parent workplace
 }
