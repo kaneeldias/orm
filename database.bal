@@ -1,115 +1,29 @@
 import ballerina/jballerina.java;
-# Represents a database client connection.
-public client class Client {
- 
-   # Initializes the DB Client. DB connection configs are fetched from the `Config.toml`
-   # + return - An `Error` if the client creation fails
-   public isolated function init() returns Error? {}
- 
- 
- 
-   # Insert the record entity value into the DB table. Table details are fetched from the 
-   # annotations
-   #
-   # + value - Entity value need to add to the DB
-   # + return - Metadata of the execution as an `ExecutionResult` or an `Error`
-   remote isolated function insert(record {} value) returns ExecutionResult|Error {
-       return {
-           affectedRowCount: 1,
-           lastInsertId: 2
-       };
-   }
- 
- 
-   # Delete the record from the DB table, for the given condition. If the condition is not 
-   # provided, all the records in the table will be deleted.
-   #
-   # + 'table - Ballerina record descriptor which mapped to the table.
-   # + condition - Condition
-   # + return - Metadata of the execution as an `ExecutionResult` or an `Error`
-   remote isolated function delete(typedesc<record {}> 'table, *Condition condition) returns ExecutionResult|Error? {
-        return {
-            affectedRowCount: 1,
-            lastInsertId: 2
-        };
-   }
- //  delete(User, name="Alice", age=30)
- 
-   # Update the record entity value to the DB table. Table details are fetched from the 
-   # annotations
-   #
-   # + updateValues - Entity value need to update the DB
-   # + return - Metadata of the execution as an `ExecutionResult` or an `Error`
-   remote isolated function update(record {} updateValues) returns ExecutionResult|Error {
-       return {
-           lastInsertId: 1,
-           affectedRowCount: 2
-       };
-   }
-	// User user = {id =1, name="Alice1"} 
-	//  update(user, name="Alice")
-	// update({name="Alice1"}, name="Alice")	
- 
-   # query the table mapped to the Ballerina record and return. If no condition is provided, 
-   # all rows are fetched.
-   #
-   # + rowType - The `typedesc` of the record to which the result needs to be returned.
-   # + condition - Condition
-   # + return - Stream of records in the `rowType` type
-   remote isolated function get(typedesc<record {}> rowType = <>, *Condition condition) returns stream <rowType, Error?> = @java:Method {
-           'class: "io.ballerina.stdlib.sql.utils.RecordIteratorUtils"
-   } external;
- 
-   # query the table mapped to the Ballerina record and return with associations. If no 
-   # condition is provided, all rows are fetched.
-   #
-   # + rowType - The `typedesc` of the record to which the result needs to be returned.
-   # + condition - Condition
-   # + return - Stream of records in the `rowType` type
-   remote isolated function getWithAssociations(typedesc<record {}> rowType = <>, *Condition  condition) returns stream <rowType, Error?> = @java:Method {
-           'class: "io.ballerina.stdlib.sql.utils.RecordIteratorUtils"
-   } external;
- 
-   # query the table mapped to the Ballerina record and return one record.
-   #
-   # + rowType - The `typedesc` of the record to which the result needs to be returned.
-   # + condition - Condition
-   # + return - Result in the `returnType` type or an `sql:Error`
-   remote isolated function getRecord(typedesc<record {}> rowType = <>, *Condition condition) returns rowType|Error = @java:Method {
-           'class: "io.ballerina.stdlib.sql.utils.RecordIteratorUtils"
-   } external;
 
-    # query the table mapped to the Ballerina record and return one record.
-   #
-   # + rowType - The `typedesc` of the record to which the result needs to be returned.
-   # + condition - Condition
-   # + return - Result in the `returnType` type or an `sql:Error`
-   remote isolated function getRecordWithAssociation(typedesc<record {}> rowType = <>, *Condition condition) returns rowType|Error = @java:Method {
-           'class: "io.ballerina.stdlib.sql.utils.RecordIteratorUtils"
-   } external;
- 
-   // Closes the connection and shuts down the connection pool.
-   public isolated function close() returns Error? {}
+// This method would be responsible for both insert and update operations
+isolated function persist(record {} 'object) returns error? {
 }
- 
-# Condition that needs to be applied for the operation.
-#
-# + 'table - table which cannot be a key
-# + rowType - rowType
-public type Condition record {|
-   never 'table?;
-   never rowType?;
-   anydata...;
+
+isolated function retrieveById(int id, typedesc<record {}> modelType = <>) returns record {}|error {}
+
+isolated function retrieve(typedesc<record {}> modelType = <>, *Filters filters) returns stream<record {}|error?> {}
+
+isolated function retrieveOne(typedesc<record {}> modelType = <>, *Filters filters) returns record {}|error {}
+
+isolated function delete(record {} 'object) returns error? {
+}
+
+public type Filters record {|
+    int|string|Comparator...;
 |};
- 
-# Metadata of the query execution.
-#
-# + affectedRowCount - Number of rows affected by the execution of the query. It may be one of the following, 
-# + lastInsertId - The ID generated by the database in response to query execution. This can be `()` in case the database does not support this feature
-public type ExecutionResult record {
-   int? affectedRowCount;
-   string|int? lastInsertId;
-};
- 
-# Defines the generic error type for the `sql` module.
-public type Error distinct error;
+
+public type Comparator [ComparisonOperator, anydata];
+
+enum ComparisonOperator {
+    GT,
+    LT,
+    GTE,
+    LTE,
+    LIKE,
+    IN
+}
