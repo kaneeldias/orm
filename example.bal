@@ -37,18 +37,18 @@ public function main() returns error? {
 
     // Option 2 -  search by field
     // `SELECT * FROM Employees WHERE name = 'Kaneel Dias' LIMIT 1`
-    Employee _ = check retrieveOne({"name": "Kaneel Dias"});
+    Employee _ = check retrieveOne(name = "Kaneel Dias");
 
     // Option 3 - search by multiple fields
     // `SELECT * FROM Employees WHERE name = 'Kaneel Dias' AND salary > 300 LIMIT 1`
-    Employee _ = check retrieveOne({
-        "name": "Kaneel Dias",
-        "salary": [GT, 300]
-    });
+    Employee _ = check retrieveOne(
+        name = "Kaneel Dias",
+        salary = [GT, 300]
+    );
 
     // Option 4 - as stream
     // `SELECT * FROM Employees WHERE name = 'Kaneel Dias'`
-    stream<Employee|error?> _ = retrieve({"name": "Kaneel Dias"});
+    stream<Employee|error?> _ = retrieve(name = "Kaneel Dias");
 
     // Option 5 - retrieve all
     // `SELECT * FROM Employees`
