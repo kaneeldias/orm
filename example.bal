@@ -43,7 +43,7 @@ public function main() returns error? {
     // `SELECT * FROM Employees WHERE name = 'Kaneel Dias' AND salary > 300 LIMIT 1`
     Employee _ = check retrieveOne(
         name = "Kaneel Dias",
-        salary = [GT, 300]
+        fq = `salary > 300` // shall we have special parameter to add any advanced filter queries like this. 
     );
 
     // Option 4 - as stream
@@ -56,12 +56,7 @@ public function main() returns error? {
 
     // Option 6 - select OR
     // `SELECT * FROM Employees WHERE name = 'Kaneel Dias' OR salary > 300`
-    stream<Employee|error?> _ = retrieve({
-        or: [
-            { "name": "Kaneel Dias" },
-            { "salary": [GT, 300] }
-        ]
-    });
+    stream<Employee|error?> _ = retrieve(fq = `name = "Kaneel Dias" OR salary > 300`);
 
     // Option 7 - Advanced query
     // `SELECT * FROM Employees WHERE (name = 'Kaneel Dias' AND salary > 300) OR (name = 'Kaneel Dias2' AND salary > 400)`
