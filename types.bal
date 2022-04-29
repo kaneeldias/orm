@@ -5,7 +5,7 @@ public type Filter record {|
 
 public type FilterCriteria boolean|int|float|decimal|string|Comparator;
 
-public type Comparator [ComparisonOperator, anydata];
+public type Comparator [ComparisonOperator, boolean|int|float|decimal|string];
 
 enum ComparisonOperator {
     GT,
