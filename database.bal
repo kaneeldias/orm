@@ -9,12 +9,12 @@ isolated function retrieveById(int id, typedesc<record {}> modelType = <>) retur
     name: ""
 } external;
 
-isolated function retrieve(Filter? filters = (), typedesc<record {}> modelType = <>) returns stream<modelType|error?>  = @java:Method {
+isolated function retrieve(Filter|FilterQuery? filter = (), typedesc<record {}> modelType = <>) returns stream<modelType|error?>  = @java:Method {
     'class: "",
     name: ""
 } external;
 
-isolated function retrieveOne(Filter? filters = (), typedesc<record {}> modelType = <>) returns modelType|error  = @java:Method {
+isolated function retrieveOne(Filter|FilterQuery? filter = (), typedesc<record {}> modelType = <>) returns modelType|error  = @java:Method {
     'class: "",
     name: ""
 } external;
