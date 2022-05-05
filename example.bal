@@ -37,25 +37,26 @@ public function main() returns error? {
 
     // Option 2 -  search by field
     // `SELECT * FROM Employees WHERE name = 'Kaneel Dias' LIMIT 1`
-    Employee _ = check retrieveOne({"name": "Kaneel Dias"});
+    Employee _ = check retrieveOne(name = "Kaneel Dias");
     // OR
-    Employee _ = check retrieveOne(`name = "Kaneel Dias"`);
+    Employee _ = check retrieveOne(fq = `name = "Kaneel Dias"`);
 
     // Option 3 - search by multiple fields
-    // `SELECT * FROM Employees WHERE name = 'Kaneel Dias' AND salary > 300 LIMIT 1`
+    // `SELECT * FROM Employees WHERE name = 'Kaneel Dias' AND salary = 300 LIMIT 1`
     Employee _ = check retrieveOne(
-        {"name": "Kaneel Dias", "salary": [GT, 300]}
+        name = "Kaneel Dias",
+        salary = 300
     );
     // OR 
     Employee _ = check retrieveOne(
-        `name = "Kaneel Dias" AND salary > 300`
+        fq = `name = "Kaneel Dias" AND salary = 300`
     );
 
     // Option 4 - as stream
     // `SELECT * FROM Employees WHERE name = 'Kaneel Dias'`
-    stream<Employee|error?> _ = retrieve({"name": "Kaneel Dias"});
+    stream<Employee|error?> _ = retrieve(name =  "Kaneel Dias");
     // OR
-    stream<Employee|error?> _ = retrieve(`name = "Kaneel Dias`);
+    stream<Employee|error?> _ = retrieve(name = "Kaneel Dias");
 
     // Option 5 - retrieve all
     // `SELECT * FROM Employees`
@@ -63,35 +64,18 @@ public function main() returns error? {
 
     // Option 6 - select OR
     // `SELECT * FROM Employees WHERE name = 'Kaneel Dias' OR salary > 300`
-    stream<Employee|error?> _ = retrieve({or: [{"name": "Kaneel Dias"}, {"salary": [GT, 300]}]});
-    // OR
-    stream<Employee|error?> _ = retrieve(`name = "Kaneel Dias" OR salary > 300`);
+    stream<Employee|error?> _ = retrieve(fq = `name = "Kaneel Dias" OR salary > 300`);
 
     // Option 7 - Advanced query
     // `SELECT * FROM Employees WHERE (name = 'Kaneel Dias' AND salary > 300) OR (name = 'Kaneel Dias2' AND salary > 400)`
-    stream<Employee|error?> _ = retrieve({
-        or: [
-            { "name": "Kaneel Dias", "salary": [GT, 300] },
-            { "name": "Kaneel Dias2", "salary": [GT, 400] }
-        ]
-    });
-    // OR
     stream<Employee|error?> _ = retrieve(
-        `name = 'Kaneel Dias' AND salary > 300) OR (name = 'Kaneel Dias2' AND salary > 400)`
+        fq = `name = 'Kaneel Dias' AND salary > 300) OR (name = 'Kaneel Dias2' AND salary > 400)`
     );
 
     // Option 8 - Advanced query 2
     // `SELECT * FROM Employees WHERE (salary < 300 OR  salary > 400) AND name = 'Kaneel Dias2'`
-    stream<Employee|error?> _ = retrieve({
-        or: [
-            { "salary": [LT, 300] },
-            { "salary": [GT, 400] }
-        ],
-        "name": "Kaneel Dias"
-    });
-    // OR
     stream<Employee|error?> _ = retrieve(
-       `salary < 300 OR  salary > 400) AND name = 'Kaneel Dias2'`
+       fq = `salary < 300 OR  salary > 400) AND name = 'Kaneel Dias2'`
     );
 
     emp.name = "Kaneel Dias 2";
